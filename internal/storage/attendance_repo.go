@@ -59,3 +59,14 @@ func (r *AttendanceRepo) GetAverageAttendance() (float64, error) {
 	average := float64(total) / float64(lecturesCount)
 	return average, nil
 }
+
+func (r *AttendanceRepo) GetStudentAttendanceCount(chatID int64) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Attendance{}).
+		Where("chat_id = ?", chatID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
