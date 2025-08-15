@@ -24,9 +24,15 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
+# env file/config file
 .env
+*.env
+/*.env
+credentials.json
 
 # Editor/IDE
 # .idea/
-# .vscode/
+.vscode/
+
+.db
+/lectio.db
