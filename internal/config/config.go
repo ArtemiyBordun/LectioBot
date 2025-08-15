@@ -11,8 +11,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	envPath        = "internal/config/config.env"
+	courseConfPath = "internal/config/course_config.json"
+)
+
 func LoadConfig() *models.Config {
-	err := godotenv.Load("internal/config/config.env")
+	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatalf("Ошибка загрузки config.env: %v", err)
 	}
@@ -56,7 +61,7 @@ func LoadConfig() *models.Config {
 		log.Fatal("CREDENTIALS_FILE не задан")
 	}
 
-	course, _ := LoadCourseConfig("internal/config/course_config.json")
+	course, _ := LoadCourseConfig(courseConfPath)
 
 	return models.GetConfig(botToken, adminIDs, course, lecturerID, spreadsheetID, credentialsFile)
 }

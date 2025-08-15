@@ -1,26 +1,25 @@
 package main
 
 import (
+	"fmt"
+	"sync"
+
 	"LectioBot/internal/adapter"
 	"LectioBot/internal/config"
 	"LectioBot/internal/storage"
 	"LectioBot/pkg/external"
-	"fmt"
-	"sync"
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	cfg := config.LoadConfig() //Загружаем конфиг бота
 
 	db, err := storage.InitSQLite("lectio.db")
 	if err != nil {
 		panic(fmt.Sprintf("Ошибка подключения к SQLite: %v", err))
 	}
 
-	fmt.Println("Подключение к SQLite успешно!")
-
 	sheet := external.NewSheet(cfg.SpreadsheetID, cfg.CredentialsFile)
-	go sheet.LoadStudentsFromAllSheets()
+	go sheet.LoadStudentsFromAllSheets() //создаем коннект с гугл таблицами
 
 	var wg sync.WaitGroup
 
