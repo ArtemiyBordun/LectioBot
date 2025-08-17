@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"LectioBot/internal/adapter/updater"
 	"LectioBot/internal/context"
 	"LectioBot/internal/models"
 	"LectioBot/pkg/external"
@@ -20,6 +21,7 @@ func StartBot(cfg *models.Config, db *gorm.DB, sheet *external.Sheet) {
 
 	context := context.NewContext(bot, cfg, db, sheet)
 
-	updater := NewUpdater(context)
-	updater.CheckUpdates()
+	updater := updater.NewUpdater(context)
+	sub := updater.NewSubUpdater()
+	updater.CheckUpdates(sub)
 }

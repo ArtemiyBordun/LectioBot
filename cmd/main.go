@@ -19,7 +19,7 @@ func main() {
 	}
 
 	sheet := external.NewSheet(cfg.SpreadsheetID, cfg.CredentialsFile)
-	go sheet.LoadStudentsFromAllSheets() //создаем коннект с гугл таблицами
+	//go sheet.LoadStudentsFromAllSheets() //создаем коннект с гугл таблицами
 
 	var wg sync.WaitGroup
 
