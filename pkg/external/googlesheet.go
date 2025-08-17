@@ -107,9 +107,10 @@ func (s *Sheet) LoadStudentsFromAllSheets() {
 				continue
 			}
 			fullName := strings.TrimSpace(fmt.Sprintf("%v", row[1]))
-			if fullName == "" {
+			if fullName == "" || fullName == "Максимум" || fullName == "Срок" {
 				continue
 			}
+			fmt.Println(fullName)
 
 			// Баллы ОП
 			pointsOP := -1.0

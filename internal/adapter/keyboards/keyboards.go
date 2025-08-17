@@ -14,10 +14,18 @@ func GetAdminKeyBoard() tgbotapi.ReplyKeyboardMarkup {
 	)
 }
 
-func GetConfirmDateKeyboard() tgbotapi.ReplyKeyboardMarkup {
+func GetConfirmKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	return tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Да"),
+		),
+	)
+}
+
+func GetSendKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	return tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Отправить"),
 		),
 	)
 }
@@ -59,6 +67,18 @@ func GetLectureKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	return tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Меня не было((("),
+		),
+	)
+}
+
+func GetConfigKeyboard() tgbotapi.InlineKeyboardMarkup {
+	return tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Изменить макс. баллы", "edit_max_points"),
+			tgbotapi.NewInlineKeyboardButtonData("Изменить мин. баллы", "edit_min_points"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("❌ Отмена", "cancel"),
 		),
 	)
 }
