@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -23,6 +24,9 @@ type Sheet struct {
 type Student struct {
 	FullName string
 	Group    string
+
+	PointsOP  float64
+	PointsOOP float64
 }
 
 func NewSheet(spreadsheetID, credentialsFile string) *Sheet {
@@ -63,22 +67,77 @@ func (s *Sheet) LoadStudentsFromAllSheets() {
 
 	for _, sheet := range spreadsheet.Sheets {
 		sheetName := sheet.Properties.Title
-		readRange := fmt.Sprintf("%s!B2:B", sheetName)
+		readRange := fmt.Sprintf("%s!A1:Z", sheetName)
 
 		resp, err := srv.Spreadsheets.Values.Get(s.SpreadsheetID, readRange).Do()
 		if err != nil {
-			log.Println("ошибка чтения листа %s: %w", sheetName, err)
-			return
+			log.Printf("ошибка чтения листа %s: %v", sheetName, err)
+			continue
 		}
 
-		for _, row := range resp.Values {
-			if len(row) == 0 {
+		var colOP, colOOP int = -1, -1
+		var startRow int = -1
+
+		for rIndex, row := range resp.Values {
+			for cIndex, cell := range row {
+				val := strings.TrimSpace(fmt.Sprintf("%v", cell))
+				switch val {
+				case "Σ ОП", "Σ":
+					colOP = cIndex
+					startRow = rIndex + 1
+				case "Σ ООП":
+					colOOP = cIndex
+					if startRow == -1 {
+						startRow = rIndex + 1
+					}
+				}
+			}
+			if colOP != -1 && colOOP != -1 {
+				break
+			}
+		}
+
+		if colOP == -1 && colOOP == -1 {
+			continue
+		}
+
+		for i := startRow; i < len(resp.Values); i++ {
+			row := resp.Values[i]
+			if len(row) < 2 {
 				continue
 			}
-			fullName := fmt.Sprintf("%v", row[0])
+			fullName := strings.TrimSpace(fmt.Sprintf("%v", row[1]))
+			if fullName == "" {
+				continue
+			}
+
+			// Баллы ОП
+			pointsOP := -1.0
+			if colOP != -1 && colOP < len(row) {
+				valStr := strings.ReplaceAll(strings.TrimSpace(fmt.Sprintf("%v", row[colOP])), ",", ".")
+				if valStr != "" {
+					if parsed, err := strconv.ParseFloat(valStr, 64); err == nil {
+						pointsOP = parsed
+					}
+				}
+			}
+
+			// Баллы ООП
+			pointsOOP := -1.0
+			if colOOP != -1 && colOOP < len(row) {
+				valStr := strings.ReplaceAll(strings.TrimSpace(fmt.Sprintf("%v", row[colOOP])), ",", ".")
+				if valStr != "" {
+					if parsed, err := strconv.ParseFloat(valStr, 64); err == nil {
+						pointsOOP = parsed
+					}
+				}
+			}
+
 			students = append(students, Student{
-				FullName: fullName,
-				Group:    sheetName,
+				FullName:  fullName,
+				Group:     sheetName,
+				PointsOP:  pointsOP,
+				PointsOOP: pointsOOP,
 			})
 		}
 	}
@@ -179,4 +238,14 @@ func isFirstSemester(group string) bool {
 		}
 	}
 	return false
+}
+
+func (s *Sheet) GetStudentByName(input string) *Student {
+	input = strings.ToLower(strings.TrimSpace(input))
+	for i, st := range s.Students {
+		if strings.ToLower(strings.TrimSpace(st.FullName)) == input {
+			return &s.Students[i]
+		}
+	}
+	return nil
 }

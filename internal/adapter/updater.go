@@ -1,7 +1,9 @@
 package adapter
 
 import (
+	"LectioBot/internal/adapter/admin"
 	"LectioBot/internal/adapter/keyboards"
+	"LectioBot/internal/adapter/user"
 	"LectioBot/internal/context"
 	"LectioBot/internal/storage"
 
@@ -17,13 +19,6 @@ type Updater struct {
 func NewUpdater(ctx *context.AppContext) *Updater {
 	return &Updater{
 		Ctx: ctx,
-	}
-}
-
-func NewUpdaterForChat(ctx *context.AppContext, chatID int64) *Updater {
-	return &Updater{
-		Ctx:    ctx,
-		ChatID: chatID,
 	}
 }
 
@@ -105,7 +100,9 @@ func (u *Updater) handleMessage() {
 		msg.ReplyMarkup = cancelKeyboard
 		u.Ctx.Bot.Send(msg)
 
-	//case "👤 Профиль":
+	case "👤 Профиль":
+		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
+		usr.GetProfile()
 
 	default:
 		u.handleOtherMessages()
@@ -115,18 +112,23 @@ func (u *Updater) handleMessage() {
 func (u *Updater) handleState(state *context.UserState) {
 	switch state.State {
 	case "waiting_photo":
-		u.GetPhoto()
+		admin := admin.NewAdminData(u.Ctx, u.ChatID, u.Update)
+		admin.GetPhoto()
 	case "waiting_confirm_date":
-		u.SendDate()
+		admin := admin.NewAdminData(u.Ctx, u.ChatID, u.Update)
+		admin.SendDate()
 
 	case "registration":
-		student := u.HandleRegistrationName()
+		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
+		student := usr.HandleRegistrationName()
 		state.Student = student
 	case "registration_group":
-		u.HandleRegistrationGroup(state.Student)
+		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
+		usr.HandleRegistrationGroup(state.Student)
 
 	case "waiting_mark":
-		u.Marking()
+		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
+		usr.Marking()
 
 	default:
 		u.handleOtherMessages()

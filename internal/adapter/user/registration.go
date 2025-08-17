@@ -1,4 +1,4 @@
-package adapter
+package user
 
 import (
 	"log"
@@ -12,7 +12,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (u *Updater) HandleRegistrationName() *models.Student {
+func (u *UserData) HandleRegistrationName() *models.Student {
 	fullName := strings.TrimSpace(u.Update.Message.Text)
 	group := u.Ctx.Sheet.FindStudentGroup(fullName)
 
@@ -32,7 +32,7 @@ func (u *Updater) HandleRegistrationName() *models.Student {
 	return student
 }
 
-func (u *Updater) HandleRegistrationGroup(student *models.Student) {
+func (u *UserData) HandleRegistrationGroup(student *models.Student) {
 	_, err := u.Ctx.Sheet.IsGroup(u.Update.Message.Text)
 
 	if u.Update.Message.Text != "✅ Подтвердить" && err != nil {

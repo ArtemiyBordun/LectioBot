@@ -1,4 +1,6 @@
 {
   "max_point": 100,
-  "min_points_for_pass": 47
+  "min_points_op_for_pass": 47,
+  "min_points_oop_for_pass": 40,
+  "total_lectures": 18
 }

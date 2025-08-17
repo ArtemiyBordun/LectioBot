@@ -1,7 +1,8 @@
-package adapter
+package admin
 
 import (
 	"LectioBot/internal/adapter/keyboards"
+	"LectioBot/internal/adapter/user"
 	"LectioBot/internal/context"
 	"LectioBot/internal/models"
 	"LectioBot/internal/storage"
@@ -11,7 +12,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (u *Updater) GetPhoto() {
+func NewUserForChat(ctx *context.AppContext, chatID int64) *user.UserData {
+	return &user.UserData{
+		Ctx:    ctx,
+		ChatID: chatID,
+	}
+}
+
+func (u *AdminData) GetPhoto() {
 	if u.Update.Message.Text == "❌ Отмена" {
 		delete(u.Ctx.States, u.ChatID)
 
@@ -47,12 +55,12 @@ func (u *Updater) GetPhoto() {
 	}
 }
 
-func (u *Updater) sendPhoto(fileID, fileType, lectureNumber, lectureDate string) {
+func (u *AdminData) sendPhoto(fileID, fileType, lectureNumber, lectureDate string) {
 	repo := storage.NewStudentRepo(u.Ctx.DB)
 	ids, err := repo.GetAllIDs()
 	if err == nil {
 		for _, id := range ids {
-			updater := NewUpdaterForChat(u.Ctx, id)
+			updater := NewUserForChat(u.Ctx, id)
 			var msg tgbotapi.Chattable
 			caption := "Время отметиться на лекции номер " + lectureNumber + ", которая была " + lectureDate + "\nНайди себя на фото и отправь сюда свой номер 👇"
 			switch fileType {
@@ -79,7 +87,7 @@ func isImage(mime string) bool {
 	return mime == "image/jpeg" || mime == "image/png" || mime == "image/jpg"
 }
 
-func (u *Updater) sendDone(fileID, fileType, lectureNumberStr string) {
+func (u *AdminData) sendDone(fileID, fileType, lectureNumberStr string) {
 	keyboard := keyboards.GetConfirmDateKeyboard()
 	msg := tgbotapi.NewMessage(u.ChatID, "Файл с фото получен!\nЛекция была сегодня? Если нет, то напишите её дату в формате дд.мм.гггг")
 	msg.ReplyMarkup = keyboard
@@ -88,7 +96,7 @@ func (u *Updater) sendDone(fileID, fileType, lectureNumberStr string) {
 	u.Ctx.PhotoData = context.NewPhotoData(fileID, fileType, lectureNumberStr)
 }
 
-func (u *Updater) SendDate() {
+func (u *AdminData) SendDate() {
 	var data time.Time
 	var dateStr string
 

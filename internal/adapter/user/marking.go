@@ -1,4 +1,4 @@
-package adapter
+package user
 
 import (
 	"LectioBot/internal/adapter/keyboards"
@@ -9,7 +9,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (u *Updater) Marking() {
+func (u *UserData) Marking() {
 	if u.Update.Message.Text != "Меня не было(((" {
 		repo := storage.NewStudentRepo(u.Ctx.DB)
 		student, err := repo.GetStudentByChatID(u.ChatID)
@@ -24,14 +24,14 @@ func (u *Updater) Marking() {
 	delete(u.Ctx.States, u.ChatID)
 }
 
-func (u *Updater) sendAnswer(text string) {
+func (u *UserData) sendAnswer(text string) {
 	keyboard := keyboards.GetStartKeyboard()
 	msg := tgbotapi.NewMessage(u.ChatID, text)
 	msg.ReplyMarkup = keyboard
 	u.Ctx.Bot.Send(msg)
 }
 
-func (u *Updater) updateCountStudent(num string) {
+func (u *UserData) updateCountStudent(num string) {
 	repoLecture := storage.NewLectureRepo(u.Ctx.DB)
 	repoLecture.IncrementCountStudent(u.Ctx.LastLecture)
 
