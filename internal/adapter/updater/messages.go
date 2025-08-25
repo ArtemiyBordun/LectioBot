@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"LectioBot/internal/adapter/admin"
 	"LectioBot/internal/adapter/keyboards"
 	"LectioBot/internal/adapter/user"
 
@@ -19,14 +20,21 @@ func (u *Updater) handleMessage() {
 		u.Ctx.Bot.Send(msg)
 
 	case "⚙️ Конфигурация учебного семестра":
-		u.SetStates("check_course_config")
 		msg := tgbotapi.NewMessage(u.ChatID, "Выберите параметры")
 		msg.ReplyMarkup = keyboards.GetConfigKeyboard()
 		u.Ctx.Bot.Send(msg)
 
+	case "📊 Статистика":
+		adm := admin.NewAdminData(u.Ctx, u.ChatID, u.Update)
+		adm.GetStatistics()
+
 	case "👤 Профиль":
 		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
 		usr.GetProfile()
+
+	case "🕒 История посещения лекций":
+		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
+		usr.GetHistory()
 
 	default:
 		u.handleOtherMessages()

@@ -74,11 +74,8 @@ func GetLectureKeyboard() tgbotapi.ReplyKeyboardMarkup {
 func GetConfigKeyboard() tgbotapi.InlineKeyboardMarkup {
 	return tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Изменить макс. баллы", "edit_max_points"),
-			tgbotapi.NewInlineKeyboardButtonData("Изменить мин. баллы", "edit_min_points"),
-		),
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("❌ Отмена", "cancel"),
+			tgbotapi.NewInlineKeyboardButtonData("Изменить прох. ОП", "edit_pass_OP_points"),
+			tgbotapi.NewInlineKeyboardButtonData("Изменить прох. ООП", "edit_pass_OOP_points"),
 		),
 	)
 }

@@ -17,6 +17,11 @@ func (u *Updater) handleState(sub *SubUpdaters, state *context.UserState) {
 	case "waiting_confirm":
 		sub.AdminData.Send()
 
+	case "edit_pass_op":
+		sub.AdminData.UpdatePoint(true)
+	case "edit_pass_oop":
+		sub.AdminData.UpdatePoint(false)
+
 	case "registration":
 		usr := user.NewUserData(u.Ctx, u.ChatID, u.Update)
 		student := usr.HandleRegistrationName()
@@ -31,9 +36,6 @@ func (u *Updater) handleState(sub *SubUpdaters, state *context.UserState) {
 		usr.Marking()
 
 	case "check_course_config":
-		if u.Update.Message.Text == "❌ Отмена" {
-			// отмена
-		}
 		msg := tgbotapi.NewMessage(u.ChatID, "help")
 		msg.ReplyMarkup = keyboards.GetAdminKeyBoard()
 		u.Ctx.Bot.Send(msg)

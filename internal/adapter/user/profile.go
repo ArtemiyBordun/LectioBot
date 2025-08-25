@@ -95,3 +95,36 @@ func (u *UserData) getAttendance(chatID int64) int {
 	}
 	return int(count)
 }
+
+func (u *UserData) GetHistory() {
+	lectureRepo := storage.NewLectureRepo(u.Ctx.DB)
+	attendanceRepo := storage.NewAttendanceRepo(u.Ctx.DB)
+
+	lectures, err := lectureRepo.GetAll()
+	if err != nil {
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Ошибка при получении лекций"))
+		return
+	}
+
+	records, err := attendanceRepo.GetStudentAttendance(u.ChatID)
+	if err != nil {
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Ошибка при получении посещений"))
+		return
+	}
+
+	attended := make(map[int]bool)
+	for _, rec := range records {
+		attended[rec.LectureId] = true
+	}
+
+	history := "🕒 История посещений:\n\n"
+	for i, l := range lectures {
+		status := "❌"
+		if attended[l.Id] {
+			status = "✅"
+		}
+		history += fmt.Sprintf("Лекция %d (%s) – %s\n", i+1, l.Date, status)
+	}
+
+	u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, history))
+}

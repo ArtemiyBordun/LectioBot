@@ -14,14 +14,14 @@ import (
 
 func (u *UserData) HandleRegistrationName() *models.Student {
 	fullName := strings.TrimSpace(u.Update.Message.Text)
-	group := u.Ctx.Sheet.FindStudentGroup(fullName)
+	group, fullNameSheet := u.Ctx.Sheet.FindStudentGroup(fullName)
 
 	if group == "" {
 		sendError("ФИО не найдено, попробуйте ещё раз", u.ChatID, u.Ctx)
 		return nil
 	}
 
-	student := models.CreateStudent(u.ChatID, fullName, u.Update.Message.From.UserName, group)
+	student := models.CreateStudent(u.ChatID, fullNameSheet, u.Update.Message.From.UserName, group)
 
 	keyboard := keyboards.GetYesKeyboard()
 	msg := tgbotapi.NewMessage(u.ChatID, "Ваша группа: "+group+"?\nЕсли нет, то напишите свою группу в формате СГН3-11Б")

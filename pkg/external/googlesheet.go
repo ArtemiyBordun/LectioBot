@@ -146,14 +146,34 @@ func (s *Sheet) LoadStudentsFromAllSheets() {
 	s.Students = students
 }
 
-func (s *Sheet) FindStudentGroup(fullName string) string {
-	fullName = strings.TrimSpace(strings.ToLower(fullName))
-	for _, s := range s.Students {
-		if strings.ToLower(strings.TrimSpace(s.FullName)) == fullName {
-			return s.Group
+func (s *Sheet) FindStudentGroup(fullName string) (string, string) {
+	fullName = strings.TrimSpace(fullName)
+	if fullName == "" {
+		return "", ""
+	}
+
+	parts := strings.Fields(fullName)
+	if len(parts) < 2 {
+		return "", ""
+	}
+	inputLastName := strings.ToLower(parts[0])
+	inputFirstLetter := strings.ToLower(string([]rune(parts[1])[0]))
+
+	for _, st := range s.Students {
+		stParts := strings.Fields(strings.TrimSpace(st.FullName))
+		if len(stParts) < 2 {
+			continue
+		}
+
+		stLastName := strings.ToLower(stParts[0])
+		stFirstLetter := strings.ToLower(string([]rune(stParts[1])[0]))
+
+		if stLastName == inputLastName && stFirstLetter == inputFirstLetter {
+			return st.Group, st.FullName
 		}
 	}
-	return ""
+
+	return "", ""
 }
 
 func (s *Sheet) IsGroup(input string) (bool, error) {
