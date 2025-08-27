@@ -58,3 +58,30 @@ func (r *LectureRepo) GetIDByDate(date string) (int, error) {
 	}
 	return lecture.Id, nil
 }
+
+func (r *LectureRepo) GetStatistics(totalStudents int, attendanceRepo *AttendanceRepo) (string, error) {
+	lectures, err := r.GetAll()
+	if err != nil {
+		return "", err
+	}
+
+	if len(lectures) == 0 {
+		return "Лекций ещё не было", nil
+	}
+
+	summary := "📊 Статистика посещаемости:\n\n"
+	for i, l := range lectures {
+		summary += fmt.Sprintf(
+			"Лекция %d (%s): %d из %d студентов\n",
+			i+1, l.Date, l.CountStudent, totalStudents,
+		)
+	}
+
+	// самая активная группа
+	group, err := attendanceRepo.GetMostActiveGroup()
+	if err == nil && group != "" {
+		summary += fmt.Sprintf("\n🔥 Самая активная группа: %s", group)
+	}
+
+	return summary, nil
+}

@@ -70,3 +70,11 @@ func (r *AttendanceRepo) GetStudentAttendanceCount(chatID int64) (int64, error) 
 	}
 	return count, nil
 }
+
+func (r *AttendanceRepo) GetStudentAttendance(chatID int64) ([]models.Attendance, error) {
+	var records []models.Attendance
+	if err := r.db.Where("chat_id = ?", chatID).Find(&records).Error; err != nil {
+		return nil, err
+	}
+	return records, nil
+}

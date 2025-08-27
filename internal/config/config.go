@@ -13,7 +13,7 @@ import (
 
 const (
 	envPath        = "internal/config/config.env"
-	courseConfPath = "internal/config/course_config.json"
+	CourseConfPath = "internal/config/course_config.json"
 )
 
 func LoadConfig() *models.Config {
@@ -61,7 +61,7 @@ func LoadConfig() *models.Config {
 		log.Fatal("CREDENTIALS_FILE не задан")
 	}
 
-	course, _ := LoadCourseConfig(courseConfPath)
+	course, _ := LoadCourseConfig(CourseConfPath)
 
 	return models.GetConfig(botToken, adminIDs, course, lecturerID, spreadsheetID, credentialsFile)
 }
