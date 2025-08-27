@@ -4,6 +4,7 @@ import (
 	"LectioBot/internal/adapter/admin"
 	"LectioBot/internal/adapter/keyboards"
 	"LectioBot/internal/adapter/user"
+	"fmt"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -15,7 +16,8 @@ func (u *Updater) handleMessage() {
 	switch text {
 	case "📷 Отправить фото с лекции":
 		u.SetStates("waiting_photo")
-		msg := tgbotapi.NewMessage(u.ChatID, "Отправьте фото и подпись")
+		str := fmt.Sprintf("Отправьте фото и подписью номер лекции\nПоследняя лекция была под номером %d", u.Ctx.LastLecture)
+		msg := tgbotapi.NewMessage(u.ChatID, str)
 		msg.ReplyMarkup = keyboards.GetCancelKeyBoard()
 		u.Ctx.Bot.Send(msg)
 

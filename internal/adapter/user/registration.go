@@ -17,7 +17,7 @@ func (u *UserData) HandleRegistrationName() *models.Student {
 	group, fullNameSheet := u.Ctx.Sheet.FindStudentGroup(fullName)
 
 	if group == "" {
-		sendError("ФИО не найдено, попробуйте ещё раз", u.ChatID, u.Ctx)
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "ФИО не найдено, попробуйте ещё раз"))
 		return nil
 	}
 
@@ -33,21 +33,39 @@ func (u *UserData) HandleRegistrationName() *models.Student {
 }
 
 func (u *UserData) HandleRegistrationGroup(student *models.Student) {
-	_, err := u.Ctx.Sheet.IsGroup(u.Update.Message.Text)
+	groupName := u.Update.Message.Text
 
-	if u.Update.Message.Text != "✅ Подтвердить" && err != nil {
-		student.Group = u.Update.Message.Text
+	if groupName != "✅ Подтвердить" {
+		exists, err := u.Ctx.Sheet.IsGroup(groupName)
+		if err != nil {
+			log.Println("Ошибка проверки группы:", err)
+			u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Ошибка при проверке группы, попробуйте ещё раз"))
+			return
+		}
+
+		if !exists {
+			u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Группа не найдена. Введите правильное название группы:"))
+			return
+		}
+
+		student.Group = groupName
+
+		keyboard := keyboards.GetYesKeyboard()
+		msg := tgbotapi.NewMessage(u.ChatID, "Группа '"+groupName+"' найдена. Подтвердите выбор или введите другую группу:")
+		msg.ReplyMarkup = keyboard
+		u.Ctx.Bot.Send(msg)
+		return
 	}
 
 	repo := storage.NewStudentRepo(u.Ctx.DB)
 	if err := repo.Create(student); err != nil {
-		log.Println(err)
-		sendError("Ошибка, попробуйте ещё раз", u.ChatID, u.Ctx)
+		log.Println("Ошибка создания студента:", err)
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Ошибка регистрации, попробуйте ещё раз"))
 		return
 	}
+
 	msg := tgbotapi.NewMessage(u.ChatID, "Регистрация завершена!\nВы: "+student.Name+"\nОбучаетесь в группе: "+student.Group)
-	keyboard := keyboards.GetStartKeyboard()
-	msg.ReplyMarkup = keyboard
+	msg.ReplyMarkup = keyboards.GetStartKeyboard()
 	u.Ctx.Bot.Send(msg)
 	delete(u.Ctx.States, u.ChatID)
 }

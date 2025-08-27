@@ -85,3 +85,17 @@ func (r *LectureRepo) GetStatistics(totalStudents int, attendanceRepo *Attendanc
 
 	return summary, nil
 }
+
+func (r *LectureRepo) GetLastLectureNumber() (int, error) {
+	var lecture models.Lecture
+
+	err := r.db.Order("id DESC").First(&lecture).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return 0, nil // лекций не было
+		}
+		return 0, err
+	}
+
+	return lecture.Id, nil
+}

@@ -110,7 +110,7 @@ func (s *Sheet) LoadStudentsFromAllSheets() {
 			if fullName == "" || fullName == "Максимум" || fullName == "Срок" {
 				continue
 			}
-			fmt.Println(fullName)
+			//fmt.Println(fullName)
 
 			// Баллы ОП
 			pointsOP := -1.0
@@ -142,7 +142,7 @@ func (s *Sheet) LoadStudentsFromAllSheets() {
 			})
 		}
 	}
-
+	fmt.Printf("Всего студентов загружено: %d\n", len(students))
 	s.Students = students
 }
 
@@ -188,7 +188,7 @@ func (s *Sheet) IsGroup(input string) (bool, error) {
 	return false, nil
 }
 
-func (s *Sheet) Marking(student *models.Student, numLecture int) {
+func (s *Sheet) Marking(student *models.Student, numLecture int) string {
 	ctx := context.Background()
 
 	b, err := ioutil.ReadFile(s.CredentialsFile)
@@ -224,8 +224,9 @@ func (s *Sheet) Marking(student *models.Student, numLecture int) {
 	}
 
 	if rowIndex == -1 {
-		log.Printf("Студент %s не найден в группе %s", student.Name, student.Group)
-		return
+		str := fmt.Sprintf("Студент %s не найден в группе %s", student.Name, student.Group)
+		log.Printf(str)
+		return str
 	}
 	diff := 3
 	if !isFirstSemester(student.Group) {
@@ -245,6 +246,7 @@ func (s *Sheet) Marking(student *models.Student, numLecture int) {
 	if err != nil {
 		log.Fatalf("Ошибка записи: %v", err)
 	}
+	return ""
 }
 
 func isFirstSemester(group string) bool {

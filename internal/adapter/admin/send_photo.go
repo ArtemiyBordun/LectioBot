@@ -42,6 +42,24 @@ func (u *AdminData) GetPhoto() {
 		u.Ctx.Bot.Send(msg)
 		return
 	}
+
+	num, err := strconv.Atoi(lectureNumber)
+	if err != nil {
+		keyboard := keyboards.GetAdminKeyBoard()
+		msg := tgbotapi.NewMessage(u.ChatID, "а можно нормальные циферки")
+		msg.ReplyMarkup = keyboard
+		u.Ctx.Bot.Send(msg)
+		return
+	}
+
+	if num <= u.Ctx.LastLecture {
+		keyboard := keyboards.GetAdminKeyBoard()
+		msg := tgbotapi.NewMessage(u.ChatID, "а можно нормальные циферки, больше чем предыдущие")
+		msg.ReplyMarkup = keyboard
+		u.Ctx.Bot.Send(msg)
+		return
+	}
+
 	if len(u.Update.Message.Photo) > 0 {
 		photos := u.Update.Message.Photo
 		fileID := photos[len(photos)-1].FileID
@@ -151,5 +169,10 @@ func (u *AdminData) Send() {
 
 		repo := storage.NewLectureRepo(u.Ctx.DB)
 		repo.Create(models.CreateLecture(lectureNumber, 0, u.Date))
+	} else {
+		keyboard := keyboards.GetAdminKeyBoard()
+		msg := tgbotapi.NewMessage(u.ChatID, "отправка отменена")
+		msg.ReplyMarkup = keyboard
+		u.Ctx.Bot.Send(msg)
 	}
 }

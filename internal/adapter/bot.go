@@ -4,6 +4,7 @@ import (
 	"LectioBot/internal/adapter/updater"
 	"LectioBot/internal/context"
 	"LectioBot/internal/models"
+	"LectioBot/internal/storage"
 	"LectioBot/pkg/external"
 	"log"
 
@@ -20,6 +21,9 @@ func StartBot(cfg *models.Config, db *gorm.DB, sheet *external.Sheet) {
 	log.Printf("Бот %s запущен", bot.Self.UserName)
 
 	context := context.NewContext(bot, cfg, db, sheet)
+
+	repo := storage.NewLectureRepo(db)
+	context.LastLecture, _ = repo.GetLastLectureNumber()
 
 	updater := updater.NewUpdater(context)
 	sub := updater.NewSubUpdater()

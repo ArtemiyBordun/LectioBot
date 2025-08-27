@@ -78,3 +78,16 @@ func (r *AttendanceRepo) GetStudentAttendance(chatID int64) ([]models.Attendance
 	}
 	return records, nil
 }
+
+func (r *AttendanceRepo) GetUniqueNumberByLection(lection int) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Attendance{}).
+		Where("lecture_id = ? AND number IS NOT NULL", lection).
+		Count(&count).
+		Error
+
+	if err != nil {
+		return false, err
+	}
+	return count == 0, nil
+}

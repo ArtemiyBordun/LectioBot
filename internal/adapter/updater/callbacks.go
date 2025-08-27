@@ -11,10 +11,10 @@ func (u *Updater) handleCallback() {
 
 	switch data {
 	case "edit_pass_OOP_points":
-		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Введите новое значение минимальных баллов для допуска к экзамену по ООП"))
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Введите новое значение минимальных баллов для допуска к экзамену по ООП\nВведите '-' для выхода"))
 		u.SetStates("edit_pass_oop")
 	case "edit_pass_OP_points":
-		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Введите новое значение минимальных баллов для допуска к зачету/экзамену по ОП"))
+		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Введите новое значение минимальных баллов для допуска к зачету/экзамену по ОП\nВведите '-' для выхода"))
 		u.SetStates("edit_pass_op")
 	}
 }

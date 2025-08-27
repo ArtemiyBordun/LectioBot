@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"LectioBot/internal/adapter/keyboards"
 	"LectioBot/internal/config"
 	"LectioBot/internal/storage"
 	"strconv"
@@ -9,7 +10,15 @@ import (
 )
 
 func (u *AdminData) UpdatePoint(isOP bool) {
+	defer delete(u.Ctx.States, u.ChatID)
 	newPointStr := u.Update.Message.Text
+	if newPointStr == "-" {
+		msg := tgbotapi.NewMessage(u.ChatID, "Отмена")
+		msg.ReplyMarkup = keyboards.GetAdminKeyBoard()
+		u.Ctx.Bot.Send(msg)
+		return
+	}
+
 	newPoint, err := strconv.Atoi(newPointStr)
 	if err != nil {
 		u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "это не число("))
@@ -29,7 +38,6 @@ func (u *AdminData) UpdatePoint(isOP bool) {
 		return
 	}
 	u.Ctx.Bot.Send(tgbotapi.NewMessage(u.ChatID, "Баллы успешно сохранены"))
-	delete(u.Ctx.States, u.ChatID)
 }
 
 func (u *AdminData) GetStatistics() {
